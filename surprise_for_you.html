@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For You ❤️</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts for romantic typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&family=Pacifico&display=swap" rel="stylesheet">
+    
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%);
+            overflow: hidden; /* Prevent scrolling when button dodges or hearts float */
+            touch-action: manipulation; /* Improve touch handling */
+        }
+
+        .title-text {
+            font-family: 'Pacifico', cursive;
+        }
+
+        /* Floating Hearts Background Animation */
+        .bg-heart {
+            position: absolute;
+            bottom: -20px;
+            font-size: 24px;
+            color: rgba(255, 182, 193, 0.6);
+            animation: floatUp 8s linear infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(0.5) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-110vh) scale(1.5) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Smooth transition for the dodging button */
+        #no-btn {
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(255, 105, 180, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center relative w-full h-full">
+
+    <!-- Container for dynamic floating background hearts -->
+    <div id="floating-hearts-container" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
+
+    <!-- MAIN GAME CARD -->
+    <div id="question-card" class="glass-card relative z-10 w-[90%] max-w-md rounded-3xl p-8 flex flex-col items-center text-center transform transition-all duration-500">
+        
+        <h1 class="title-text text-3xl text-pink-600 mb-2 leading-tight">Aim for my heart, Dhara!</h1>
+        <p class="text-gray-500 mb-6 font-semibold">Pull the arrow and let it go...</p>
+        
+        <!-- Interactive Bow and Arrow Area -->
+        <div id="game-area" class="relative w-full h-[320px] flex flex-col items-center justify-between border-2 border-dashed border-pink-200 rounded-2xl bg-white/40 overflow-hidden shadow-inner">
+            
+            <!-- Target Heart -->
+            <div id="target-heart" class="text-6xl animate-pulse mt-6 relative z-10 drop-shadow-lg transition-transform duration-200">💖</div>
+            
+            <!-- Bow & Arrow Container -->
+            <div class="relative mb-6 flex items-center justify-center w-full h-32 touch-none">
+                <!-- Bow (Static decorative) -->
+                <svg class="absolute w-32 h-32 text-pink-400 opacity-60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4">
+                    <!-- Bow Curve -->
+                    <path d="M10,10 Q40,50 10,90" stroke-linecap="round"/>
+                    <!-- Bow String -->
+                    <line x1="10" y1="10" x2="10" y2="90" stroke="gray" stroke-width="1.5" stroke-dasharray="2,2"/>
+                </svg>
+                
+                <!-- Arrow (Draggable) -->
+                <div id="arrow" class="absolute w-16 h-28 cursor-grab active:cursor-grabbing flex justify-center items-end pb-2 z-20" style="touch-action: none; transform: translate(0px, 0px) rotate(0deg);">
+                    <svg viewBox="0 0 24 100" class="w-8 h-full text-pink-600 drop-shadow-md" fill="none" stroke="currentColor">
+                        <!-- Arrow Head -->
+                        <path d="M12 0 L24 20 L12 15 L0 20 Z" fill="currentColor"/>
+                        <!-- Shaft -->
+                        <line x1="12" y1="15" x2="12" y2="90" stroke-width="4"/>
+                        <!-- Fletching -->
+                        <path d="M12 70 L20 90 M12 70 L4 90 M12 80 L20 100 M12 80 L4 100" stroke-width="3"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div id="instruction" class="absolute bottom-2 text-sm text-pink-500 font-bold opacity-80 pointer-events-none transition-opacity duration-300">⬇️ Drag & Release ⬇️</div>
+        </div>
+    </div>
+
+    <!-- SUCCESS CARD (Hidden initially) -->
+    <div id="success-card" class="glass-card hidden relative z-10 w-[90%] max-w-md rounded-3xl p-8 flex flex-col items-center text-center transform scale-95 opacity-0 transition-all duration-500">
+        <!-- Cute happy/kissing GIF -->
+        <img src="https://media.tenor.com/gUiu1zyxfzYAAAAi/bear-kiss-bear-kisses.gif" 
+             alt="Happy bears kissing" 
+             class="w-56 h-56 object-cover rounded-2xl mb-6 shadow-sm"
+             onerror="this.src='https://placehold.co/200x200/ffe4e6/ff69b4?text=🥰'">
+        
+        <h1 class="title-text text-4xl text-pink-600 mb-4 drop-shadow-sm">You hit my heart, Dhara! ❤️</h1>
+        <p class="text-xl text-gray-700 font-bold mb-2">It was always yours anyway! ✨</p>
+        <p class="text-pink-400 font-semibold mt-2">I love you! 💕</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const questionCard = document.getElementById('question-card');
+            const successCard = document.getElementById('success-card');
+            const heartsContainer = document.getElementById('floating-hearts-container');
+            const arrow = document.getElementById('arrow');
+            const target = document.getElementById('target-heart');
+            const instruction = document.getElementById('instruction');
+
+            // --- Floating Hearts Background Logic ---
+            function createHeart() {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.classList.add('bg-heart');
+                
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                heart.style.fontSize = (Math.random() * 15 + 15) + 'px';
+                
+                heartsContainer.appendChild(heart);
+                setTimeout(() => { heart.remove(); }, 10000);
+            }
+            setInterval(createHeart, 400);
+
+            // --- Bow and Arrow Game Logic ---
+            let isDragging = false;
+            let startX, startY;
+            let hasShot = false; // Prevent multiple shots
+
+            function startDrag(e) {
+                if (hasShot) return;
+                isDragging = true;
+                // Support both mouse and touch
+                startX = e.clientX || (e.touches && e.touches[0].clientX);
+                startY = e.clientY || (e.touches && e.touches[0].clientY);
+                
+                arrow.style.transition = 'none'; // Remove transition for smooth dragging
+                instruction.style.opacity = '0'; // Hide text while aiming
+            }
+
+            function drag(e) {
+                if (!isDragging || hasShot) return;
+                e.preventDefault(); // Prevent scrolling on mobile while aiming
+                
+                let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                
+                let deltaX = clientX - startX;
+                let deltaY = clientY - startY;
+                
+                // Add "tension" resistance to the bow pull
+                deltaX *= 0.5;
+                deltaY *= 0.5;
+
+                // Calculate angle to make arrow point OPPOSITE of the pull (like a slingshot)
+                let aimAngle = Math.atan2(-deltaY, -deltaX) * (180 / Math.PI) + 90;
+
+                arrow.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${aimAngle}deg)`;
+            }
+
+            function endDrag(e) {
+                if (!isDragging || hasShot) return;
+                isDragging = false;
+                hasShot = true; // Lock it in
+                
+                // --- The Magic: Auto-Aim Logic ---
+                const targetRect = target.getBoundingClientRect();
+                const containerRect = arrow.parentElement.getBoundingClientRect();
+                
+                // Get absolute center of the target heart
+                const targetCenterX = targetRect.left + targetRect.width / 2;
+                const targetCenterY = targetRect.top + targetRect.height / 2;
+                
+                // Get absolute center of where the arrow ORIGINATED from
+                const originX = containerRect.left + containerRect.width / 2;
+                const originY = containerRect.top + containerRect.height / 2;
+                
+                // Calculate the true distance needed to travel to hit dead center
+                const travelX = targetCenterX - originX;
+                // Add a slight offset to Y so the arrow embeds nicely in the heart
+                const travelY = (targetCenterY - originY) + 20; 
+                
+                // Calculate perfect hit angle regardless of how she aimed
+                const hitAngle = Math.atan2(travelY, travelX) * (180 / Math.PI) + 90;
+                
+                // Animate the arrow flying
+                arrow.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+                arrow.style.transform = `translate(${travelX}px, ${travelY}px) rotate(${hitAngle}deg)`;
+                
+                // Handle the Hit Event
+                setTimeout(() => {
+                    // Heart Pop Animation
+                    target.classList.remove('animate-pulse');
+                    target.style.transform = 'scale(1.4)';
+                    
+                    // Show success screen shortly after hit
+                    setTimeout(() => {
+                        showSuccess();
+                    }, 400);
+                }, 400); // Matches the arrow travel time
+            }
+
+            // Bind Events for Mouse & Touch
+            arrow.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag, {passive: false});
+            document.addEventListener('mouseup', endDrag);
+
+            arrow.addEventListener('touchstart', startDrag, {passive: false});
+            document.addEventListener('touchmove', drag, {passive: false});
+            document.addEventListener('touchend', endDrag);
+
+            // --- Success & Confetti Logic ---
+            function showSuccess() {
+                questionCard.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    questionCard.classList.add('hidden');
+                    successCard.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        successCard.classList.remove('opacity-0', 'scale-95');
+                        successCard.classList.add('opacity-100', 'scale-100');
+                    }, 50);
+
+                    triggerConfetti();
+                }, 300);
+            }
+
+            function triggerConfetti() {
+                var duration = 4 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+                function randomInRange(min, max) {
+                    return Math.random() * (max - min) + min;
+                }
+
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) return clearInterval(interval);
+
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { 
+                        particleCount,
+                        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                        colors: ['#ff69b4', '#ffc0cb', '#ffffff', '#ff1493']
+                    }));
+                    confetti(Object.assign({}, defaults, { 
+                        particleCount,
+                        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                        colors: ['#ff69b4', '#ffc0cb', '#ffffff', '#ff1493']
+                    }));
+                }, 250);
+            }
+        });
+    </script>
+</body>
+</html>
